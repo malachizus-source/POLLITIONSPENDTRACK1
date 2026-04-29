@@ -1,32 +1,32 @@
-import requests
-import json
+import firebase_admin
+from firebase_admin import credentials, firestore
 import os
+import json
 
-# פונקציה למשיכת נתונים ממפתח התקציב (למשל: התקשרויות אחרונות)
-def check_budget():
-    # כתובת ה-API של מפתח התקציב (דוגמה להתקשרויות משרדי ממשלה)
-    url = "https://next.obudget.org/api/query?q=SELECT+publisher_name,description,amount_allocated,order_date+FROM+contract_spending+ORDER+BY+order_date+DESC+LIMIT+5"
-    
+# התחברות ל-Firebase באמצעות ה-Secret שהגדרת
+cred_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT')
+
+if cred_json:
     try:
-        response = requests.get(url)
-        data = response.json()
+        cred_dict = json.loads(cred_json)
+        cred = credentials.Certificate(cred_dict)
+        if not firebase_admin._apps:
+            firebase_admin.initialize_app(cred)
         
-        if data['rows']:
-            for row in data['rows']:
-                name = row['publisher_name']
-                desc = row['description']
-                amount = row['amount_allocated']
-                date = row['order_date']
-                
-                # כאן אנחנו יוצרים את ההודעה בעברית
-                message = f"📢 הוצאה חדשה זוהתה!\nמשרד: {name}\nתיאור: {desc}\nסכום: ₪{amount:,}\nתאריך: {date}"
-                print(message)
-                
-                # כאן בעתיד תשלח את ההתראה לאפליקציה שלך (Push Notification)
-                # send_push_notification(message)
-                
-    except Exception as e:
-        print(f"שגיאה במשיכת נתונים: {e}")
+        db = firestore.client()
 
-if __name__ == "__main__":
-    check_budget()
+        # יצירת נתון בדיקה פשוט
+        data = {
+            "name": "Test User",
+            "message": "Hello from GitHub Actions!",
+            "status": "Success"
+        }
+
+        # שמירה ב-Firebase באוסף שנקרא 'test_connection'
+        db.collection('test_connection').add(data)
+        print("✅ Success! Data sent to Firebase.")
+
+    except Exception as e:
+        print(f"❌ Error: {e}")
+else:
+    print("❌ Error: FIREBASE_SERVICE_ACCOUNT secret not found.")
