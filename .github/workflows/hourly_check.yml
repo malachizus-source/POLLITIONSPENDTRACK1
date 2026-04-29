@@ -1,0 +1,25 @@
+name: Hourly Budget Check
+
+on:
+  schedule:
+    # הקוד הזה אומר לגיטהב להריץ את הבוט פעם בשעה
+    - cron: '0 * * * *'
+  workflow_dispatch: # מאפשר לך להריץ את הבוט גם ידנית לבדיקה
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run bot
+        run: python bot.py
