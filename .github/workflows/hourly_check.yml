@@ -23,5 +23,5 @@ jobs:
 
       - name: Run bot
         env:
-         FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_POLITISPENDTRACK }}
+         FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: python bot.py
